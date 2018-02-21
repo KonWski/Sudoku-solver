@@ -39,11 +39,52 @@ public class Sudoku3 {
 
     Integer[][] getSolution(){
 
+        stepSolve(0, 0);
 
-        return null;
+        return solution;
     }
 
-    ArrayList<Integer> getPossibleValuesForRow(Integer rowNumber){
+    private void stepSolve(Integer row, Integer column){
+        System.out.println("stepSolve row: " + row + ", column: " + column);
+        System.out.println(Arrays.deepToString(solution));
+        if(fields[row][column] != 0){
+             stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+        } else if(solution[row][column] == 0){
+
+            ArrayList<Integer> possibleValues = getPossibleValuesForField(row, column);
+            switch(possibleValues.size()){
+                case 0:
+                    System.out.println("Out of ammo!");
+                    returnToField(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
+                default:
+                    System.out.println("Helol!");
+                    solution[row][column] = possibleValues.get(0);
+                    stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+            }
+
+        } else {
+
+            ArrayList<Integer> filteredPossibleValues = getFilteredPossibleValuesForField(row, column);
+            switch(filteredPossibleValues.size()){
+                case 0:
+                    returnToField(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
+                default:
+                    solution[row][column] = filteredPossibleValues.get(0);
+                    stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+            }
+        }
+
+    }
+
+    private Integer getNextStepRow(Integer row, Integer column){
+        return column != 8 ? row : ++row;
+    }
+
+    private Integer getNextStepColumn(Integer column){
+        return column != 8 ? ++column : 0;
+    }
+
+    private ArrayList<Integer> getPossibleValuesForRow(Integer rowNumber){
 
         //Analyse which values are already taken
         Integer[] takenValues = new Integer[]{
@@ -64,7 +105,7 @@ public class Sudoku3 {
         return possibleValuesRow;
     }
 
-    ArrayList<Integer> getPossibleValuesForColumn(Integer columnNumber){
+    private ArrayList<Integer> getPossibleValuesForColumn(Integer columnNumber){
 
         //Analyse which values are already taken
         Integer[] takenValues = new Integer[]{
@@ -85,7 +126,7 @@ public class Sudoku3 {
         return possibleValuesColumn;
     }
 
-    ArrayList<Integer> getPossibleValuesForSquare(Integer row, Integer column){
+    private ArrayList<Integer> getPossibleValuesForSquare(Integer row, Integer column){
 
         //Get the left high corner of square
         Integer squareNumber = squares[row][column];
@@ -105,7 +146,7 @@ public class Sudoku3 {
         return possibleValues;
     }
 
-    ArrayList<Integer> getPossibleValuesForField(Integer row, Integer column){
+    private ArrayList<Integer> getPossibleValuesForField(Integer row, Integer column){
 
         ArrayList<Integer> possibleValues = basicValues;
         possibleValues.retainAll(getPossibleValuesForRow(row));
@@ -115,34 +156,60 @@ public class Sudoku3 {
         return possibleValues;
     }
 
+    private Integer getLastModifiedFieldRow(Integer row, Integer column){
+
+        for(int columnCounter = column; columnCounter > -1; columnCounter--){
+
+            for(int rowCounter = row; rowCounter > -1; rowCounter--){
+                if(fields[rowCounter][columnCounter] == 0){return rowCounter;}
+            }
+        }
+        return 0;
+    }
+
+    private Integer getLastModifiedFieldColumn(Integer row, Integer column){
+
+        for(int columnCounter = column; columnCounter > -1; columnCounter--){
+
+            for(int rowCounter = row; rowCounter > -1; rowCounter--){
+                if(fields[rowCounter][columnCounter] == 0){return columnCounter;}
+            }
+        }
+        return 0;
+    }
+
+    private ArrayList<Integer> getFilteredPossibleValuesForField(Integer row, Integer column){
+
+        ArrayList<Integer> possibleValues = getPossibleValuesForField(row, column);
+        Integer indexCurrentValue = possibleValues.indexOf((Integer)solution[row][column]);
+
+        return indexCurrentValue == possibleValues.size() - 1 ?
+                null :
+                new ArrayList<Integer>(possibleValues.subList(indexCurrentValue, possibleValues.size() - 1));
+    }
+
     //During solving of sudoku it can occur that further permutations
     // were based on false value taken before
-    private void returnToField(int row, int column){
+    private void returnToField(Integer row, Integer column){
 
         for(int rowSolution = row; rowSolution < 9; rowSolution++){
 
-            for(int columnSolution = column; columnSolution < 9; columnSolution++){
+            for(int columnSolution = column + 1; columnSolution < 9; columnSolution++){
 
                 solution[rowSolution][columnSolution] = fields[rowSolution][columnSolution];
-
             }
-
         }
 
+        stepSolve(row, column);
     }
 
-    //Method returns all possible rows given input fields
-    /*
-    private ArrayList<Integer[]> permute(ArrayList<Integer> row){
+    private Integer getNextPossibleValue(int row, int column){
 
-        ArrayList<Integer[]> possibleValues = ;
-        ArrayList<Integer[]> permutations;
-
-
-
-
-
-        return null;
+        ArrayList<Integer> possibleValues = getPossibleValuesForField(row, column);
+        Integer currentValue = solution[row][column];
+        Integer indexCurrentValue = possibleValues.indexOf((Integer)currentValue);
+        return indexCurrentValue != possibleValues.size() - 1 ? possibleValues.get(indexCurrentValue) : 0;
     }
-*/
+
+
 }

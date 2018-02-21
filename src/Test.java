@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Test {
 
@@ -17,8 +17,7 @@ public class Test {
                 };
 
         Sudoku3 sudoku = new Sudoku3(fields);
-        ArrayList<Integer> possibleValues = sudoku.getPossibleValuesForRow(1);
-        System.out.println(possibleValues);
+        System.out.println(Arrays.toString(sudoku.getSolution()));
     }
 
 }
