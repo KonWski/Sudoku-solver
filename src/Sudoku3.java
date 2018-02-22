@@ -5,7 +5,9 @@ public class Sudoku3 {
 
     public final Integer[][] fields;
     private Integer[][] solution;
-    private final ArrayList<Integer> basicValues = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+
+    //private final ArrayList<Integer> basicValues = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+    private final Integer[] basicValues = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     /*
      0|1|2
@@ -45,8 +47,9 @@ public class Sudoku3 {
     }
 
     private void stepSolve(Integer row, Integer column){
+
         System.out.println("stepSolve row: " + row + ", column: " + column);
-        System.out.println(Arrays.deepToString(solution));
+        //System.out.println(Arrays.deepToString(solution));
         if(fields[row][column] != 0){
              stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
         } else if(solution[row][column] == 0){
@@ -55,6 +58,7 @@ public class Sudoku3 {
             switch(possibleValues.size()){
                 case 0:
                     System.out.println("Out of ammo!");
+                    System.out.println("Getting back to row: " + row + " column: " + column);
                     returnToField(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
                 default:
                     System.out.println("Helol!");
@@ -84,6 +88,14 @@ public class Sudoku3 {
         return column != 8 ? ++column : 0;
     }
 
+    private Integer getPreviousStepRow(Integer row, Integer column){
+        return column != 1 ? row : --row;
+    }
+
+    private Integer getPreviousStepColumn(Integer column){
+        return column != 1 ? --column : 8;
+    }
+
     private ArrayList<Integer> getPossibleValuesForRow(Integer rowNumber){
 
         //Analyse which values are already taken
@@ -99,9 +111,9 @@ public class Sudoku3 {
                 solution[rowNumber][8]};
 
         //Check what values are still possible
-        ArrayList<Integer> possibleValuesRow = basicValues;
+        ArrayList<Integer> possibleValuesRow = new ArrayList<>(Arrays.asList(basicValues));;
         possibleValuesRow.removeAll(Arrays.asList(takenValues));
-
+        System.out.println("possibleValuesRow: " + possibleValuesRow.size());
         return possibleValuesRow;
     }
 
@@ -120,8 +132,9 @@ public class Sudoku3 {
                 solution[8][columnNumber]};
 
         //Check what values are still possible
-        ArrayList<Integer> possibleValuesColumn = basicValues;
+        ArrayList<Integer> possibleValuesColumn = new ArrayList<>(Arrays.asList(basicValues));
         possibleValuesColumn.removeAll(Arrays.asList(takenValues));
+        System.out.println("possibleValuesColumnSize: " + possibleValuesColumn.size());
 
         return possibleValuesColumn;
     }
@@ -133,22 +146,21 @@ public class Sudoku3 {
         Integer squareCornerRow = squareLeftHighCornerRow[squareNumber];
         Integer squareCornerColumn = squareLeftHighCornerColumn[squareNumber];
 
-        ArrayList<Integer> possibleValues = basicValues;
-
+        ArrayList<Integer> possibleValues = new ArrayList<>(Arrays.asList(basicValues));
         for(int rowCounter = 0; rowCounter < 3; rowCounter++){
 
             for(int columnCounter = 0; columnCounter < 3; columnCounter++){
 
-                possibleValues.remove((Integer)solution[rowCounter][columnCounter]);
+                possibleValues.remove((Integer)solution[squareCornerRow + rowCounter][squareCornerColumn + columnCounter]);
             }
         }
-
+       System.out.println("possibleValuesSquare: " + possibleValues.size());
         return possibleValues;
     }
 
     private ArrayList<Integer> getPossibleValuesForField(Integer row, Integer column){
 
-        ArrayList<Integer> possibleValues = basicValues;
+        ArrayList<Integer> possibleValues = new ArrayList<>(Arrays.asList(basicValues));
         possibleValues.retainAll(getPossibleValuesForRow(row));
         possibleValues.retainAll(getPossibleValuesForColumn(column));
         possibleValues.retainAll(getPossibleValuesForSquare(row, column));
@@ -158,20 +170,27 @@ public class Sudoku3 {
 
     private Integer getLastModifiedFieldRow(Integer row, Integer column){
 
-        for(int columnCounter = column; columnCounter > -1; columnCounter--){
+        Integer previousRow = getPreviousStepRow(row, column);
+        Integer previousColumn = getPreviousStepColumn(column);
 
-            for(int rowCounter = row; rowCounter > -1; rowCounter--){
+        for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
+
+            for(int rowCounter = previousRow; rowCounter > -1; rowCounter--){
                 if(fields[rowCounter][columnCounter] == 0){return rowCounter;}
             }
         }
+        System.out.println("I fucked up!");
         return 0;
     }
 
     private Integer getLastModifiedFieldColumn(Integer row, Integer column){
 
-        for(int columnCounter = column; columnCounter > -1; columnCounter--){
+        Integer previousRow = getPreviousStepRow(row, column);
+        Integer previousColumn = getPreviousStepColumn(column);
 
-            for(int rowCounter = row; rowCounter > -1; rowCounter--){
+        for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
+
+            for(int rowCounter = previousRow; rowCounter > -1; rowCounter--){
                 if(fields[rowCounter][columnCounter] == 0){return columnCounter;}
             }
         }
