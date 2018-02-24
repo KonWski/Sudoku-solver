@@ -80,6 +80,7 @@ public class Sudoku3 {
 
             ArrayList<Integer> filteredPossibleValues = getFilteredPossibleValuesForField(row, column, tempValue);
             System.out.println("filteredPossibleValuesSize: " + filteredPossibleValues.size());
+            System.out.println("tempValue: " + tempValue);
 
             switch(filteredPossibleValues.size()){
                 case 0:
@@ -105,11 +106,11 @@ public class Sudoku3 {
     }
 
     private Integer getPreviousStepRow(Integer row, Integer column){
-        return column != 1 ? row : --row;
+        return column != 0 ? row : --row;
     }
 
     private Integer getPreviousStepColumn(Integer column){
-        return column != 1 ? --column : 8;
+        return column != 0 ? --column : 8;
     }
 
     private ArrayList<Integer> getPossibleValuesForRow(Integer rowNumber){
@@ -194,14 +195,7 @@ public class Sudoku3 {
                 if(fields[rowCounter][columnCounter] == 0){return rowCounter;}
             }
         }
-        /*
-        for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
 
-            for(int rowCounter = previousRow; rowCounter > -1; rowCounter--){
-                if(fields[rowCounter][columnCounter] == 0){return rowCounter;}
-            }
-        }
-        */
         System.out.println("I fucked up looking for row!");
         return 0;
     }
@@ -211,21 +205,17 @@ public class Sudoku3 {
         Integer previousRow = getPreviousStepRow(row, column);
         Integer previousColumn = getPreviousStepColumn(column);
 
+        if(row == 4 && column == 1){
+            System.out.println("previousRow: " + previousRow);
+            System.out.println("previousColumn: " + previousColumn);
+        }
         for(int rowCounter = previousRow; rowCounter > -1; rowCounter--){
 
             for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
                 if(fields[rowCounter][columnCounter] == 0){return columnCounter;}
             }
         }
-        /*
-        for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
-            //System.out.println("Next column: " + columnCounter);
-            for(int rowCounter = previousRow; rowCounter > -1; rowCounter--){
-                //System.out.println("Next row: " + rowCounter);
-                if(fields[rowCounter][columnCounter] == 0){return columnCounter;}
-            }
-        }
-        */
+
         System.out.println("I fucked up looking for column!");
         return 0;
     }
@@ -242,7 +232,7 @@ public class Sudoku3 {
 
         return indexCurrentValue == possibleValues.size() - 1 ?
                 new ArrayList<Integer>() :
-                new ArrayList<Integer>(possibleValues.subList(indexCurrentValue + 1, possibleValues.size() - 1));
+                new ArrayList<Integer>(possibleValues.subList(indexCurrentValue + 1, possibleValues.size()));
     }
 
     //During solving of sudoku it can occur that further permutations
