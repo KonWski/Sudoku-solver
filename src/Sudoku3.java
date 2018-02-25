@@ -72,7 +72,7 @@ public class Sudoku3 {
                     solution[row][column] = possibleValues.get(0);
                     stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
             }
-
+        //TODO attach condition to omit StackOverFlowException
         } else {
 
             Integer tempValue = solution[row][column];
@@ -188,12 +188,15 @@ public class Sudoku3 {
 
         Integer previousRow = getPreviousStepRow(row, column);
         Integer previousColumn = getPreviousStepColumn(column);
-
+        if(row == 1 && column == 1){
+            System.out.println(Arrays.deepToString(fields));
+        }
         for(int rowCounter = previousRow; rowCounter > -1; rowCounter--){
 
             for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
                 if(fields[rowCounter][columnCounter] == 0){return rowCounter;}
             }
+            previousColumn = 8; //Start next loop from the end of row
         }
 
         System.out.println("I fucked up looking for row!");
@@ -214,6 +217,7 @@ public class Sudoku3 {
             for(int columnCounter = previousColumn; columnCounter > -1; columnCounter--){
                 if(fields[rowCounter][columnCounter] == 0){return columnCounter;}
             }
+            previousColumn = 8;  //Start next loop from the end of row
         }
 
         System.out.println("I fucked up looking for column!");
