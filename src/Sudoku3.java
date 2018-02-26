@@ -34,6 +34,12 @@ public class Sudoku3 {
             0, 3, 6, 0, 3, 6, 0, 3, 6
     };
 
+    private Integer rowBeginn = 0;
+
+    private Integer columnBeginn = 0;
+
+    private Integer solveCounter = 0;
+
     Sudoku3 (Integer[][]fields){
         this.fields = fields;
 
@@ -45,56 +51,94 @@ public class Sudoku3 {
 
     Integer[][] getSolution(){
 
-        stepSolve(0, 0);
+        System.out.println("isSudokuSolved(): " + isSudokuSolved());
+
+        while(isSudokuSolved() == false){
+            stepSolve(rowBeginn, columnBeginn);
+        }
 
         return solution;
     }
 
     private void stepSolve(Integer row, Integer column){
 
+        solveCounter++;
         System.out.println("stepSolve row: " + row + ", column: " + column);
         System.out.println(Arrays.deepToString(solution));
-        if(fields[row][column] != 0){
-             stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
-        } else if(solution[row][column] == 0){
+        System.out.println("solveCounter: " + solveCounter);
 
-            ArrayList<Integer> possibleValues = getPossibleValuesForField(row, column);
-            switch(possibleValues.size()){
-                case 0:
-                    System.out.println("Out of ammo!");
-                    System.out.println("Getting back to row: " + getLastModifiedFieldRow(row, column) +
-                            " column: " + getLastModifiedFieldColumn(row, column));
+        if(solveCounter < 1000 && row < 9) {
 
-                    stepSolve(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
-                    //returnToField(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
-                default:
-                    System.out.println("Helol!");
-                    solution[row][column] = possibleValues.get(0);
-                    stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+            if (fields[row][column] != 0) {
+                stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+            } else if (solution[row][column] == 0) {
+
+                ArrayList<Integer> possibleValues = getPossibleValuesForField(row, column);
+                switch (possibleValues.size()) {
+                    case 0:
+
+                        System.out.println("Out of ammo!");
+                        System.out.println("Getting back to row: " + getLastModifiedFieldRow(row, column) +
+                                " column: " + getLastModifiedFieldColumn(row, column));
+
+                        stepSolve(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
+                        return;
+                    default:
+                        System.out.println("Helol!");
+                        solution[row][column] = possibleValues.get(0);
+                        stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+                }
+
+            } else if (solution[row][column] != 0) {
+
+                Integer tempValue = solution[row][column];
+                solution[row][column] = 0;
+
+                ArrayList<Integer> filteredPossibleValues = getFilteredPossibleValuesForField(row, column, tempValue);
+                System.out.println("filteredPossibleValuesSize: " + filteredPossibleValues.size());
+                System.out.println("tempValue: " + tempValue);
+
+                switch (filteredPossibleValues.size()) {
+                    case 0:
+
+                        System.out.println("case 0");
+                        stepSolve(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
+                        return;
+                    default:
+
+                        System.out.println("default > 0");
+                        solution[row][column] = filteredPossibleValues.get(0);
+                        stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+                }
             }
-        //TODO attach condition to omit StackOverFlowException
         } else {
+            rowBeginn = row;
+            columnBeginn = column;
+            solveCounter = 0;
+            return;
+        }
+    }
 
-            Integer tempValue = solution[row][column];
-            solution[row][column] = 0;
+    private boolean isSudokuSolved(){
+        for(int row = 0; row < 9; row++){
 
-            ArrayList<Integer> filteredPossibleValues = getFilteredPossibleValuesForField(row, column, tempValue);
-            System.out.println("filteredPossibleValuesSize: " + filteredPossibleValues.size());
-            System.out.println("tempValue: " + tempValue);
-
-            switch(filteredPossibleValues.size()){
-                case 0:
-
-                    System.out.println("case 0");
-                    stepSolve(getLastModifiedFieldRow(row, column), getLastModifiedFieldColumn(row, column));
-                default:
-
-                    System.out.println("default > 0");
-                    solution[row][column] = filteredPossibleValues.get(0);
-                    stepSolve(getNextStepRow(row, column), getNextStepColumn(column));
+            int sum = 0;
+            for(int column = 0; column < 9; column++){
+                sum = sum + solution[row][column];
             }
+            if(sum != 45){return false;}
         }
 
+        for(int column = 0; column < 9; column++){
+
+            int sum = 0;
+            for(int row = 0; row < 9; row++){
+                sum = sum + solution[row][column];
+            }
+            if(sum != 45){return false;}
+        }
+
+        return true;
     }
 
     private Integer getNextStepRow(Integer row, Integer column){

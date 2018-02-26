@@ -16,8 +16,31 @@ public class Test {
                 {0, 0, 0, 0, 8, 0, 0, 7, 9}
                 };
 
-        Sudoku3 sudoku = new Sudoku3(fields);
-        System.out.println(Arrays.toString(sudoku.getSolution()));
+        Integer[][] fields2 = new Integer[][]{
+                {0, 0, 0, 0, 0, 7, 5, 0, 0},
+                {7, 0, 0, 1, 0, 0, 0, 4, 0},
+                {5, 0, 0, 0, 0, 0, 2, 0, 0},
+                {0, 0, 1, 3, 9, 0, 0, 0, 8},
+                {3, 0, 0, 7, 8, 6, 0, 0, 4},
+                {8, 0, 0, 0, 4, 1, 7, 0, 0},
+                {0, 0, 8, 0, 0, 0, 0, 0, 9},
+                {0, 5, 0, 0, 0, 3, 0, 0, 1},
+                {0, 0, 4, 6, 0, 0, 0, 0, 0}
+        };
+
+
+        Sudoku3 sudoku = new Sudoku3(fields2);
+        prettyPrint(sudoku.getSolution());
+        //System.out.println(Arrays.deepToString(sudoku.getSolution()));
+    }
+
+    public static void prettyPrint(Integer[][] sudoku){
+        for(int row = 0; row < 9; row++){
+            for(int column = 0; column < 9; column++){
+                System.out.print(sudoku[row][column] + " ");
+            }
+            System.out.println();
+        }
     }
 
 }
